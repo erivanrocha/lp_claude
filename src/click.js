@@ -1,4 +1,4 @@
-// Cloudflare Pages Function: POST /api/click
+// POST /api/click
 // Registra no D1 (binding "DB") cada clique no botão de WhatsApp.
 // Não recebe nome, telefone ou e-mail: apenas código curto, gclid, página, botão e tipo de dispositivo.
 
@@ -8,7 +8,7 @@ const GCLID_RE = /^[A-Za-z0-9_-]{1,512}$/;
 const PAGE_RE = /^\/[\w\-./]{0,199}$/;
 const BUTTON_RE = /^[a-z-]{1,20}$/;
 
-export async function onRequestPost({ request, env }) {
+export async function handleClick(request, env) {
   const origin = request.headers.get('Origin');
   if (origin && origin !== new URL(request.url).origin) {
     return new Response(null, { status: 403 });

@@ -1,0 +1,14 @@
+{
+  "name": "lp-claude",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply nvo-endereco-fiscal --remote",
+    "db:migrate:local": "wrangler d1 migrations apply nvo-endereco-fiscal --local"
+  },
+  "devDependencies": {
+    "wrangler": "^4.143.0"
+  }
+}

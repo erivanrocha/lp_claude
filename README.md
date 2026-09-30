@@ -1,11 +1,11 @@
 # Landing Page — Endereço Fiscal em Natal (NVO Coworking)
 
-Página única em HTML, CSS e JS puros, publicada no **Cloudflare Pages**, com uma **Pages Function** que grava os cliques no botão de WhatsApp no **Cloudflare D1**.
+Página única em HTML, CSS e JS puros, publicada como **Cloudflare Worker com arquivos estáticos** (deploy com `npx wrangler deploy`). O Worker só responde por `POST /api/click`, que grava os cliques no botão de WhatsApp no **Cloudflare D1**; o resto é servido direto da pasta `public/`.
 
 ## Estrutura
 
 ```
-public/                         → tudo o que é publicado (diretório de saída do Pages)
+public/                         → arquivos da página (servidos como static assets)
   index.html                    → landing page
   politica-de-privacidade.html  → Política de Privacidade (/politica-de-privacidade)
   404.html
@@ -14,10 +14,11 @@ public/                         → tudo o que é publicado (diretório de saíd
   assets/logo/*.svg             → 6 variações do logo (vertical/horizontal × colorida/branca/negativa)
   assets/fonts/                 → Outfit (OFL), self-hosted
   _headers, robots.txt, sitemap.xml, favicon.svg
-functions/api/click.js          → POST /api/click → grava no D1
+src/index.js                    → Worker: roteia /api/click, o resto vai para os arquivos estáticos
+src/click.js                    → validação e gravação do clique no D1
 migrations/0001_whatsapp_clicks.sql
 scripts/exportar-conversoes.mjs → gera o CSV de conversões offline para o Google Ads
-wrangler.toml
+wrangler.toml                   → nome do Worker, assets e binding do D1
 ```
 
 ## Pendências (SUBSTITUIR QUANDO DISPONÍVEL)
@@ -36,30 +37,36 @@ Contatos, número do WhatsApp e texto da mensagem ficam no topo de `public/asset
 
 ## Publicação no Cloudflare
 
-Pré-requisito: Node.js 18+ e uma conta Cloudflare.
+Configuração já definida no `wrangler.toml`:
+- Worker `lp-claude`. **Esse nome precisa ser igual ao nome do Worker no painel da Cloudflare.** Se o seu tiver outro nome, troque o `name` no `wrangler.toml`.
+- Banco D1 `nvo-endereco-fiscal`, ID `2413cf3a-a47c-4ded-a13d-cddc4c996a87`, ligado como `DB`.
 
-1. **Criar o banco D1**
-   ```bash
-   npx wrangler login
-   npx wrangler d1 create nvo-endereco-fiscal
-   ```
-   Copie o `database_id` exibido para o `wrangler.toml`.
-2. **Criar a tabela**
-   ```bash
-   npx wrangler d1 migrations apply nvo-endereco-fiscal --remote
-   ```
-3. **Criar o projeto no Pages.** No painel Cloudflare, vá em *Workers & Pages → Create → Pages → Connect to Git*, escolha o repositório `erivanrocha/lp_claude` e configure:
-   - Framework preset: *None*
-   - Build command: *(vazio)*
-   - Build output directory: `public`
-4. **Ligar o D1 ao projeto** (caso o painel não leia o `wrangler.toml`): *Settings → Bindings → Add → D1 database*, com a variável `DB` apontando para o banco `nvo-endereco-fiscal`.
-5. **Domínio.** Em *Custom domains*, adicione `enderecofiscal.nvocoworking.com.br`. No **Registro.br**, crie um registro **CNAME** `enderecofiscal` apontando para o endereço `*.pages.dev` do projeto.
-6. **(Recomendado) Limite de requisições.** Em *Security → WAF → Rate limiting rules*, limite `POST /api/click` (ex.: 20 por minuto por IP) para evitar registros de lixo.
+### Configuração de build no painel
+Em *Workers & Pages → (seu Worker) → Settings → Build*:
+- Build command: *(vazio)*
+- Deploy command: `npx wrangler deploy`
+- Root directory: `/`
 
-Para testar localmente:
+O `package.json` fixa a versão do Wrangler, e o build instala as dependências sozinho.
+
+### Criar a tabela (uma única vez)
+O deploy não cria a tabela. Escolha uma das formas:
+- No painel: *Storage & Databases → D1 → nvo-endereco-fiscal → Console*, cole o conteúdo de `migrations/0001_whatsapp_clicks.sql` e execute.
+- Pelo terminal: `npx wrangler login` e depois `npm run db:migrate`.
+
+### Domínio
+Em *Settings → Domains & Routes → Add → Custom domain*, adicione `enderecofiscal.nvocoworking.com.br`. Como o DNS do `nvocoworking.com.br` está no **Registro.br** (e não na Cloudflare), o domínio personalizado do Worker só funciona se a zona estiver na Cloudflare. As opções são:
+1. mover os nameservers do `nvocoworking.com.br` para a Cloudflare (recomendado); ou
+2. enquanto isso, usar o endereço `lp-claude.<sua-conta>.workers.dev`.
+
+### (Recomendado) Limite de requisições
+Em *Security → WAF → Rate limiting rules* (na zona do domínio), limite `POST /api/click` (ex.: 20 por minuto por IP) para evitar registros de lixo.
+
+### Testar localmente
 ```bash
-npx wrangler d1 migrations apply nvo-endereco-fiscal --local
-npx wrangler pages dev
+npm install
+npm run db:migrate:local
+npm run dev
 ```
 
 ## Rastreamento
