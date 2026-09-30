@@ -14,8 +14,11 @@
   <meta property="og:title" content="Endereço Fiscal em Natal | NVO Coworking">
   <meta property="og:description" content="Endereço fiscal em Natal/RN em um prédio empresarial de verdade. 12x de R$ 99,00 sem juros no cartão.">
   <meta property="og:url" content="https://enderecofiscal.nvocoworking.com.br/">
-  <!-- SUBSTITUIR QUANDO DISPONÍVEL: imagem de compartilhamento (1200x630) com foto real do prédio
-  <meta property="og:image" content="https://enderecofiscal.nvocoworking.com.br/assets/img/og.jpg"> -->
+  <meta property="og:image" content="https://enderecofiscal.nvocoworking.com.br/assets/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Entrada do Empresarial Candelária, em Natal/RN">
+  <meta name="twitter:card" content="summary_large_image">
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/assets/fonts/outfit-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
@@ -138,16 +141,10 @@
           </div>
         </div>
 
-        <!-- SUBSTITUIR QUANDO DISPONÍVEL: foto real (fachada, recepção ou vista).
-             Trocar o <div> abaixo por:
-             <picture>
-               <source type="image/avif" srcset="/assets/img/hero-800.avif 800w, /assets/img/hero-1200.avif 1200w" sizes="(min-width: 960px) 520px, 100vw">
-               <img src="/assets/img/hero-800.webp" srcset="/assets/img/hero-800.webp 800w, /assets/img/hero-1200.webp 1200w" sizes="(min-width: 960px) 520px, 100vw" alt="Fachada do Empresarial Candelária, em Natal" width="1200" height="1500" fetchpriority="high">
-             </picture> -->
-        <div class="hero-photo photo-placeholder" role="img" aria-label="Foto do Empresarial Candelária (em breve)">
-          <svg class="ph-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-building"/></svg>
-          <span>Empresarial Candelária</span>
-        </div>
+        <picture class="hero-photo">
+          <source type="image/avif" srcset="/assets/img/fachada-entrada-640.avif 640w, /assets/img/fachada-entrada-1040.avif 1040w" sizes="(min-width: 960px) 440px, 100vw">
+          <img src="/assets/img/fachada-entrada-640.webp" srcset="/assets/img/fachada-entrada-640.webp 640w, /assets/img/fachada-entrada-1040.webp 1040w" sizes="(min-width: 960px) 440px, 100vw" alt="Entrada do Empresarial Candelária, prédio do NVO Coworking na Rua Raimundo Chaves, 2182, em Natal" width="1040" height="1604" fetchpriority="high">
+        </picture>
       </div>
     </section>
 
@@ -261,21 +258,35 @@
       <div class="container">
         <h2 id="estrutura-titulo">Um endereço comercial em Natal que você pode visitar</h2>
         <p class="section-intro">Sua empresa fica registrada no Empresarial Candelária, um prédio comercial com recepção e salas de reunião, e não em uma sala qualquer.</p>
-        <!-- SUBSTITUIR QUANDO DISPONÍVEL: fotos reais. Trocar cada .photo-placeholder por
-             <img src="/assets/img/NOME-800.webp" srcset="..." sizes="(min-width: 768px) 50vw, 100vw" alt="DESCRIÇÃO" loading="lazy" width="800" height="600"> -->
+        <!-- SUBSTITUIR QUANDO DISPONÍVEL: fotos de recepção e sala de reunião (e vista, se houver).
+             Use o mesmo formato das fotos abaixo, com arquivos em /assets/img/ (WebP + AVIF, 600 e 1000 px). -->
         <div class="gallery">
-          <div class="photo-placeholder" role="img" aria-label="Fachada (foto em breve)">
-            <svg class="ph-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-building"/></svg><span>Fachada</span>
-          </div>
-          <div class="photo-placeholder" role="img" aria-label="Recepção (foto em breve)">
-            <svg class="ph-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-user"/></svg><span>Recepção</span>
-          </div>
-          <div class="photo-placeholder" role="img" aria-label="Vista (foto em breve)">
-            <svg class="ph-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-pin"/></svg><span>Vista</span>
-          </div>
-          <div class="photo-placeholder" role="img" aria-label="Sala de reunião (foto em breve)">
-            <svg class="ph-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-table"/></svg><span>Sala de reunião</span>
-          </div>
+          <figure>
+            <picture>
+              <source type="image/avif" srcset="/assets/img/fachada-600.avif 600w, /assets/img/fachada-1000.avif 1000w" sizes="(min-width: 960px) 25vw, 50vw">
+              <img src="/assets/img/fachada-600.webp" srcset="/assets/img/fachada-600.webp 600w, /assets/img/fachada-1000.webp 1000w" sizes="(min-width: 960px) 25vw, 50vw" alt="Fachada envidraçada do Empresarial Candelária" width="1000" height="750" loading="lazy">
+            </picture>
+            <figcaption>Fachada</figcaption>
+          </figure>
+          <figure>
+            <picture>
+              <source type="image/avif" srcset="/assets/img/letreiro-600.avif 600w, /assets/img/letreiro-960.avif 960w" sizes="(min-width: 960px) 25vw, 50vw">
+              <img src="/assets/img/letreiro-600.webp" srcset="/assets/img/letreiro-600.webp 600w, /assets/img/letreiro-960.webp 960w" sizes="(min-width: 960px) 25vw, 50vw" alt="Letreiro do Empresarial Candelária, número 2182" width="960" height="720" loading="lazy">
+            </picture>
+            <figcaption>Entrada</figcaption>
+          </figure>
+          <figure>
+            <div class="photo-placeholder" role="img" aria-label="Recepção (foto em breve)">
+              <svg class="ph-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-user"/></svg>
+            </div>
+            <figcaption>Recepção</figcaption>
+          </figure>
+          <figure>
+            <div class="photo-placeholder" role="img" aria-label="Sala de reunião (foto em breve)">
+              <svg class="ph-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-table"/></svg>
+            </div>
+            <figcaption>Sala de reunião</figcaption>
+          </figure>
         </div>
       </div>
     </section>

@@ -25,8 +25,7 @@ wrangler.toml                   → nome do Worker, assets e binding do D1
 
 | Item | Onde |
 |---|---|
-| Fotos reais (hero + galeria: fachada, recepção, vista, sala de reunião) | `public/index.html`: procure por `SUBSTITUIR QUANDO DISPONÍVEL` (há um exemplo de `<picture>`/`<img>` pronto no comentário). Salve as imagens em `public/assets/img/` em WebP/AVIF, com 800 e 1200 px de largura. |
-| Imagem de compartilhamento (`og:image`, 1200×630) | `<head>` do `index.html` |
+| Fotos que faltam: recepção, sala de reunião e vista (hero, fachada e entrada já estão na página) | Galeria do `public/index.html`: procure por `SUBSTITUIR QUANDO DISPONÍVEL` e siga o formato das fotos já usadas (WebP + AVIF em `public/assets/img/`, 600 e 1000 px de largura). |
 | 3 depoimentos (com autorização por escrito) | Bloco comentado `DEPOIMENTOS` no `index.html` |
 | ID de conversão do Google Ads (`{GOOGLE_ADS_CONVERSION_ID_A_DEFINIR}`) | Configurado no GTM (ver abaixo), não no código |
 | ID do banco D1 | `wrangler.toml` → `database_id` |
