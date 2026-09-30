@@ -176,7 +176,7 @@ a.stat:hover .stat-link { color: var(--yellow-hover); }
 .testimonial blockquote { margin: 0 0 16px; }
 
 .gallery { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
-@media (min-width: 960px) { .gallery { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 960px) { .gallery { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
 .gallery figure { margin: 0; }
 .gallery .photo-placeholder, .gallery img { aspect-ratio: 4 / 3; width: 100%; object-fit: cover; border-radius: var(--radius); background: var(--bg-alt); }
 .gallery figcaption { margin-top: 8px; font-size: 15px; font-weight: 600; color: var(--ink-2); }
