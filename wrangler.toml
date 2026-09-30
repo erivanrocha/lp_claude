@@ -1,6 +1,6 @@
 # Cloudflare Workers (static assets + D1). Deploy: npx wrangler deploy (ver README.md)
 # O "name" precisa ser igual ao nome do Worker no painel da Cloudflare.
-name = "lp-claude"
+name = "nvo-endereco-fiscal"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 

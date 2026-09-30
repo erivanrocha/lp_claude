@@ -38,7 +38,7 @@ Contatos, número do WhatsApp e texto da mensagem ficam no topo de `public/asset
 ## Publicação no Cloudflare
 
 Configuração já definida no `wrangler.toml`:
-- Worker `lp-claude`. **Esse nome precisa ser igual ao nome do Worker no painel da Cloudflare.** Se o seu tiver outro nome, troque o `name` no `wrangler.toml`.
+- Worker `nvo-endereco-fiscal`, igual ao nome do projeto no painel da Cloudflare. **Se o nome no painel mudar, troque também o `name` no `wrangler.toml`.**
 - Banco D1 `nvo-endereco-fiscal`, ID `2413cf3a-a47c-4ded-a13d-cddc4c996a87`, ligado como `DB`.
 
 ### Configuração de build no painel
@@ -57,7 +57,7 @@ O deploy não cria a tabela. Escolha uma das formas:
 ### Domínio
 Em *Settings → Domains & Routes → Add → Custom domain*, adicione `enderecofiscal.nvocoworking.com.br`. Como o DNS do `nvocoworking.com.br` está no **Registro.br** (e não na Cloudflare), o domínio personalizado do Worker só funciona se a zona estiver na Cloudflare. As opções são:
 1. mover os nameservers do `nvocoworking.com.br` para a Cloudflare (recomendado); ou
-2. enquanto isso, usar o endereço `lp-claude.<sua-conta>.workers.dev`.
+2. enquanto isso, usar o endereço `nvo-endereco-fiscal.<sua-conta>.workers.dev`.
 
 ### (Recomendado) Limite de requisições
 Em *Security → WAF → Rate limiting rules* (na zona do domínio), limite `POST /api/click` (ex.: 20 por minuto por IP) para evitar registros de lixo.
