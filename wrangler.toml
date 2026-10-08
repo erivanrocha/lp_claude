@@ -1,20 +1,11 @@
-# Cloudflare Workers (static assets + D1). Deploy: npx wrangler deploy (ver README.md)
-# O "name" precisa ser igual ao nome do Worker no painel da Cloudflare.
-name = "nvo-endereco-fiscal"
-main = "src/index.js"
+# Cloudflare Pages (arquivos estáticos em public/ + Pages Functions em functions/ + D1). Ver README.md
+# O "name" precisa ser igual ao nome do projeto Pages no painel da Cloudflare.
+name = "nvo-endereco-fiscal-pages"
+pages_build_output_dir = "public"
 compatibility_date = "2026-09-01"
-
-[assets]
-directory = "./public"
-binding = "ASSETS"
-html_handling = "auto-trailing-slash"
-not_found_handling = "404-page"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "nvo-endereco-fiscal"
 database_id = "2413cf3a-a47c-4ded-a13d-cddc4c996a87"
 migrations_dir = "migrations"
-
-[observability]
-enabled = true

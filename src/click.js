@@ -1,4 +1,4 @@
-// POST /api/click
+// POST /api/click (usado pela Pages Function functions/api/click.js e pelo Worker antigo src/index.js)
 // Registra no D1 (binding "DB") cada clique no botão de WhatsApp.
 // Não recebe nome, telefone ou e-mail: apenas código curto, gclid, página, botão e tipo de dispositivo.
 

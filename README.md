@@ -1,24 +1,29 @@
 # Landing Page — Endereço Fiscal em Natal (NVO Coworking)
 
-Página única em HTML, CSS e JS puros, publicada como **Cloudflare Worker com arquivos estáticos** (deploy com `npx wrangler deploy`). O Worker só responde por `POST /api/click`, que grava os cliques no botão de WhatsApp no **Cloudflare D1**; o resto é servido direto da pasta `public/`.
+Página única em HTML, CSS e JS puros, publicada no **Cloudflare Pages**. Os arquivos da pasta `public/` são servidos direto; a **Pages Function** `functions/api/click.js` responde por `POST /api/click` e grava os cliques no botão de WhatsApp no **Cloudflare D1**.
+
+> **Transição:** a versão anterior rodava como Cloudflare Worker (`nvo-endereco-fiscal`). A configuração dele foi mantida em `wrangler.worker.toml` (com `src/index.js`) até o Pages ser confirmado em produção. Depois disso, o Worker e esses dois arquivos podem ser removidos.
 
 ## Estrutura
 
 ```
-public/                         → arquivos da página (servidos como static assets)
+public/                         → arquivos da página (saída do build do Pages)
   index.html                    → landing page
   politica-de-privacidade.html  → Política de Privacidade (/politica-de-privacidade)
   404.html
   assets/css/style.css
   assets/js/main.js             → WhatsApp + código de rastreio + gclid + banner de cookies
+  assets/img/                   → fotos (AVIF + WebP)
   assets/logo/*.svg             → 6 variações do logo (vertical/horizontal × colorida/branca/negativa)
   assets/fonts/                 → Outfit (OFL), self-hosted
   _headers, robots.txt, sitemap.xml, favicon.svg
-src/index.js                    → Worker: roteia /api/click, o resto vai para os arquivos estáticos
-src/click.js                    → validação e gravação do clique no D1
+functions/api/click.js          → Pages Function: POST /api/click (outros métodos: 405)
+src/click.js                    → validação e gravação do clique no D1 (usado pela Function e pelo Worker antigo)
+src/index.js                    → Worker antigo (temporário)
 migrations/0001_whatsapp_clicks.sql
 scripts/exportar-conversoes.mjs → gera o CSV de conversões offline para o Google Ads
-wrangler.toml                   → nome do Worker, assets e binding do D1
+wrangler.toml                   → Cloudflare Pages: nome do projeto, pasta public/ e binding do D1
+wrangler.worker.toml            → Worker antigo (temporário)
 ```
 
 ## Pendências (SUBSTITUIR QUANDO DISPONÍVEL)
@@ -28,25 +33,31 @@ wrangler.toml                   → nome do Worker, assets e binding do D1
 | Novas fotos (opcional; todas as seções já têm fotos reais) | Galeria do `public/index.html`: siga o formato das fotos já usadas (WebP + AVIF em `public/assets/img/`, 600 e 1000 px de largura). |
 | 3 depoimentos (com autorização por escrito) | Bloco comentado `DEPOIMENTOS` no `index.html` |
 | ID de conversão do Google Ads (`{GOOGLE_ADS_CONVERSION_ID_A_DEFINIR}`) | Configurado no GTM (ver abaixo), não no código |
-| ID do banco D1 | `wrangler.toml` → `database_id` |
 | SVG oficial do logo (exportado do Illustrator) | Substituir os arquivos em `public/assets/logo/`, mantendo os mesmos nomes |
 | Variações do título (teste A/B) | `<h1>` do `index.html` |
 
 Contatos, número do WhatsApp e texto da mensagem ficam no topo de `public/assets/js/main.js` (`CONFIG`). O número também aparece nos `href` dos botões no HTML: eles servem de reserva caso o JavaScript não carregue.
 
-## Publicação no Cloudflare
+## Publicação no Cloudflare Pages
 
 Configuração já definida no `wrangler.toml`:
-- Worker `nvo-endereco-fiscal`, igual ao nome do projeto no painel da Cloudflare. **Se o nome no painel mudar, troque também o `name` no `wrangler.toml`.**
+- Projeto Pages `nvo-endereco-fiscal-pages`. **O nome do projeto no painel precisa ser igual ao `name` do `wrangler.toml`.**
+- Saída do build: pasta `public`.
 - Banco D1 `nvo-endereco-fiscal`, ID `2413cf3a-a47c-4ded-a13d-cddc4c996a87`, ligado como `DB`.
 
-### Configuração de build no painel
-Em *Workers & Pages → (seu Worker) → Settings → Build*:
+### Criar o projeto no painel
+Em *Workers & Pages → Create → Pages → Connect to Git*, escolha o repositório `erivanrocha/lp_claude` e configure:
+- Project name: `nvo-endereco-fiscal-pages`
+- Production branch: `claude/awesome-fermat-xt7569`
+- Framework preset: *None*
 - Build command: *(vazio)*
-- Deploy command: `npx wrangler deploy`
-- Root directory: `/`
+- Build output directory: `public`
+- Root directory: *(vazio)*
 
-O `package.json` fixa a versão do Wrangler, e o build instala as dependências sozinho.
+O D1 é ligado pelo `wrangler.toml`. Depois do primeiro deploy, confira em *(projeto) → Settings → Bindings* se aparece `DB → nvo-endereco-fiscal`. Se não aparecer, adicione ali: *Add → D1 database*, nome da variável `DB`, banco `nvo-endereco-fiscal`.
+
+### Worker antigo (temporário)
+O Worker `nvo-endereco-fiscal` continua no ar com a última versão publicada. Como o `wrangler.toml` agora é do Pages, os próximos builds automáticos do Worker vão falhar, mas o site dele não sai do ar por isso. Para o Worker continuar recebendo atualizações até a troca, mude o deploy command dele (*Settings → Build*) para `npx wrangler deploy --config wrangler.worker.toml`.
 
 ### Criar a tabela (uma única vez)
 O deploy não cria a tabela. Escolha uma das formas:
@@ -54,12 +65,10 @@ O deploy não cria a tabela. Escolha uma das formas:
 - Pelo terminal: `npx wrangler login` e depois `npm run db:migrate`.
 
 ### Domínio
-Em *Settings → Domains & Routes → Add → Custom domain*, adicione `enderecofiscal.nvocoworking.com.br`. Como o DNS do `nvocoworking.com.br` está no **Registro.br** (e não na Cloudflare), o domínio personalizado do Worker só funciona se a zona estiver na Cloudflare. As opções são:
-1. mover os nameservers do `nvocoworking.com.br` para a Cloudflare (recomendado); ou
-2. enquanto isso, usar o endereço `nvo-endereco-fiscal.<sua-conta>.workers.dev`.
+No projeto Pages: *Custom domains → Set up a custom domain*, informe `enderecofiscal.nvocoworking.com.br` e siga as instruções. Com o DNS no **Registro.br**, basta criar lá um registro **CNAME** `enderecofiscal` apontando para `nvo-endereco-fiscal-pages.pages.dev`. Até lá, a página fica acessível em `https://nvo-endereco-fiscal-pages.pages.dev`.
 
 ### (Recomendado) Limite de requisições
-Em *Security → WAF → Rate limiting rules* (na zona do domínio), limite `POST /api/click` (ex.: 20 por minuto por IP) para evitar registros de lixo.
+Em *Security → WAF → Rate limiting rules* (disponível quando o domínio estiver na Cloudflare), limite `POST /api/click` (ex.: 20 por minuto por IP) para evitar registros de lixo.
 
 ### Testar localmente
 ```bash

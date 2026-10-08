@@ -1,0 +1,22 @@
+# Configuração ANTIGA do Cloudflare Worker (static assets + D1), mantida até o Pages ser confirmado.
+# O wrangler.toml agora é do Cloudflare Pages. Para o Worker continuar fazendo deploy,
+# o comando de deploy dele no painel precisa ser: npx wrangler deploy --config wrangler.worker.toml
+# O "name" precisa ser igual ao nome do Worker no painel da Cloudflare.
+name = "nvo-endereco-fiscal"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nvo-endereco-fiscal"
+database_id = "2413cf3a-a47c-4ded-a13d-cddc4c996a87"
+migrations_dir = "migrations"
+
+[observability]
+enabled = true

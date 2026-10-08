@@ -3,8 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "dev": "wrangler pages dev",
+    "deploy": "wrangler pages deploy",
+    "dev:worker": "wrangler dev --config wrangler.worker.toml",
+    "deploy:worker": "wrangler deploy --config wrangler.worker.toml",
     "db:migrate": "wrangler d1 migrations apply nvo-endereco-fiscal --remote",
     "db:migrate:local": "wrangler d1 migrations apply nvo-endereco-fiscal --local"
   },
