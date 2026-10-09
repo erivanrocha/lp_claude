@@ -19,7 +19,7 @@ ORDER BY sold_at`;
 
 const output = execFileSync(
   'npx',
-  ['wrangler', 'd1', 'execute', 'nvo-endereco-fiscal', '--remote', '--json', '--command', sql],
+  ['wrangler', 'd1', 'execute', 'nvo-endereco-fiscal-db', '--remote', '--json', '--command', sql],
   { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }
 );
 const rows = JSON.parse(output)[0].results;

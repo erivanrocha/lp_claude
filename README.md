@@ -1,8 +1,6 @@
 # Landing Page — Endereço Fiscal em Natal (NVO Coworking)
 
-Página única em HTML, CSS e JS puros, publicada no **Cloudflare Pages**. Os arquivos da pasta `public/` são servidos direto; a **Pages Function** `functions/api/click.js` responde por `POST /api/click` e grava os cliques no botão de WhatsApp no **Cloudflare D1**.
-
-> **Transição:** a versão anterior rodava como Cloudflare Worker (`nvo-endereco-fiscal`). A configuração dele foi mantida em `wrangler.worker.toml` (com `src/index.js`) até o Pages ser confirmado em produção. Depois disso, o Worker e esses dois arquivos podem ser removidos.
+Página única em HTML, CSS e JS puros, publicada no **Cloudflare Pages** (projeto `nvo-endereco-fiscal-pages`) em **https://enderecofiscal.nvocoworking.com.br**. Os arquivos da pasta `public/` são servidos direto; a **Pages Function** `functions/api/click.js` responde por `POST /api/click` e grava os cliques no botão de WhatsApp no **Cloudflare D1** `nvo-endereco-fiscal-db` (binding `DB`).
 
 ## Estrutura
 
@@ -19,12 +17,10 @@ public/                         → arquivos da página (saída do build do Page
   _headers, robots.txt, sitemap.xml, favicon.svg
 functions/_middleware.js        → redireciona (301) *.pages.dev para o domínio próprio, com noindex
 functions/api/click.js          → Pages Function: POST /api/click (outros métodos: 405)
-src/click.js                    → validação e gravação do clique no D1 (usado pela Function e pelo Worker antigo)
-src/index.js                    → Worker antigo (temporário)
+src/click.js                    → validação e gravação do clique no D1 (usado por functions/api/click.js)
 migrations/0001_whatsapp_clicks.sql
 scripts/exportar-conversoes.mjs → gera o CSV de conversões offline para o Google Ads
 wrangler.toml                   → Cloudflare Pages: nome do projeto, pasta public/ e binding do D1
-wrangler.worker.toml            → Worker antigo (temporário)
 ```
 
 ## Pendências (SUBSTITUIR QUANDO DISPONÍVEL)
@@ -41,34 +37,34 @@ Contatos, número do WhatsApp e texto da mensagem ficam no topo de `public/asset
 
 ## Publicação no Cloudflare Pages
 
-Configuração já definida no `wrangler.toml`:
+Configuração definida no `wrangler.toml`:
 - Projeto Pages `nvo-endereco-fiscal-pages`. **O nome do projeto no painel precisa ser igual ao `name` do `wrangler.toml`.**
 - Saída do build: pasta `public`.
-- Banco D1 `nvo-endereco-fiscal`, ID `2413cf3a-a47c-4ded-a13d-cddc4c996a87`, ligado como `DB`.
+- Banco D1 `nvo-endereco-fiscal-db`, ID `2413cf3a-a47c-4ded-a13d-cddc4c996a87`, ligado como `DB`.
 
-### Criar o projeto no painel
-Em *Workers & Pages → Create → Pages → Connect to Git*, escolha o repositório `erivanrocha/lp_claude` e configure:
-- Project name: `nvo-endereco-fiscal-pages`
+### Configuração do projeto no painel
+Em *Workers & Pages → nvo-endereco-fiscal-pages → Settings → Builds*:
 - Production branch: `claude/awesome-fermat-xt7569`
 - Framework preset: *None*
 - Build command: *(vazio)*
 - Build output directory: `public`
 - Root directory: *(vazio)*
 
-O D1 é ligado pelo `wrangler.toml`. Depois do primeiro deploy, confira em *(projeto) → Settings → Bindings* se aparece `DB → nvo-endereco-fiscal`. Se não aparecer, adicione ali: *Add → D1 database*, nome da variável `DB`, banco `nvo-endereco-fiscal`.
+Cada push na branch de produção publica o site automaticamente.
 
-### Worker antigo (temporário)
-O Worker `nvo-endereco-fiscal` continua no ar com a última versão publicada. Como o `wrangler.toml` agora é do Pages, os próximos builds automáticos do Worker vão falhar, mas o site dele não sai do ar por isso. Para o Worker continuar recebendo atualizações até a troca, mude o deploy command dele (*Settings → Build*) para `npx wrangler deploy --config wrangler.worker.toml`.
+O D1 é ligado pelo `wrangler.toml`. Para conferir, abra *nvo-endereco-fiscal-pages → Settings → Bindings*: deve aparecer `DB → nvo-endereco-fiscal-db`.
 
 ### Criar a tabela (uma única vez)
 O deploy não cria a tabela. Escolha uma das formas:
-- No painel: *Storage & Databases → D1 → nvo-endereco-fiscal → Console*, cole o conteúdo de `migrations/0001_whatsapp_clicks.sql` e execute.
+- No painel: *Storage & Databases → D1 → nvo-endereco-fiscal-db → Console*, cole o conteúdo de `migrations/0001_whatsapp_clicks.sql` e execute.
 - Pelo terminal: `npx wrangler login` e depois `npm run db:migrate`.
 
 ### Domínio
 O domínio `https://enderecofiscal.nvocoworking.com.br` está ativo no projeto Pages (*Custom domains*), com um CNAME `enderecofiscal` no Registro.br apontando para `nvo-endereco-fiscal-pages.pages.dev`.
 
 Qualquer acesso por `nvo-endereco-fiscal-pages.pages.dev` ou pelos previews (`*.nvo-endereco-fiscal-pages.pages.dev`) recebe um **redirecionamento 301** para o mesmo caminho no domínio próprio, preservando a query string (inclusive `?gclid=`), e o cabeçalho `X-Robots-Tag: noindex`. Isso é feito em `functions/_middleware.js`. O domínio próprio e o `localhost` não são afetados. Por causa disso, os previews de branch também abrem o domínio próprio, e não a versão da branch.
+
+Como o middleware roda em todos os acessos, todas as requisições contam no limite de Functions do Pages (no plano gratuito, 100 mil por dia).
 
 ### (Recomendado) Limite de requisições
 Em *Security → WAF → Rate limiting rules* (disponível quando o domínio estiver na Cloudflare), limite `POST /api/click` (ex.: 20 por minuto por IP) para evitar registros de lixo.
@@ -103,7 +99,7 @@ O código não instala o GA4 nem o Google Ads diretamente: tudo é configurado d
 ### Marcar vendas e enviar conversões offline ao Google Ads
 Quando a venda for fechada, localize o código (`Ref ...`) recebido no WhatsApp e marque o registro:
 ```bash
-npx wrangler d1 execute nvo-endereco-fiscal --remote --command \
+npx wrangler d1 execute nvo-endereco-fiscal-db --remote --command \
   "UPDATE whatsapp_clicks SET status='vendido', sold_at=strftime('%Y-%m-%dT%H:%M:%SZ','now'), sale_value=1188 WHERE ref_code='K7M2Q'"
 ```
 Periodicamente, gere o CSV no formato do Google Ads:
@@ -114,6 +110,6 @@ Em seguida, envie o arquivo `conversoes-offline.csv` em *Google Ads → Metas �
 
 Ver os últimos cliques:
 ```bash
-npx wrangler d1 execute nvo-endereco-fiscal --remote --command \
+npx wrangler d1 execute nvo-endereco-fiscal-db --remote --command \
   "SELECT ref_code, gclid, created_at, button, device, status FROM whatsapp_clicks ORDER BY id DESC LIMIT 50"
 ```

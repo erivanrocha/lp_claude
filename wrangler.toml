@@ -6,6 +6,6 @@ compatibility_date = "2026-09-01"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "nvo-endereco-fiscal"
+database_name = "nvo-endereco-fiscal-db"
 database_id = "2413cf3a-a47c-4ded-a13d-cddc4c996a87"
 migrations_dir = "migrations"
