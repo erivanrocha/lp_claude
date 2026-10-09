@@ -17,6 +17,7 @@ public/                         → arquivos da página (saída do build do Page
   assets/logo/*.svg             → 6 variações do logo (vertical/horizontal × colorida/branca/negativa)
   assets/fonts/                 → Outfit (OFL), self-hosted
   _headers, robots.txt, sitemap.xml, favicon.svg
+functions/_middleware.js        → redireciona (301) *.pages.dev para o domínio próprio, com noindex
 functions/api/click.js          → Pages Function: POST /api/click (outros métodos: 405)
 src/click.js                    → validação e gravação do clique no D1 (usado pela Function e pelo Worker antigo)
 src/index.js                    → Worker antigo (temporário)
@@ -65,7 +66,9 @@ O deploy não cria a tabela. Escolha uma das formas:
 - Pelo terminal: `npx wrangler login` e depois `npm run db:migrate`.
 
 ### Domínio
-No projeto Pages: *Custom domains → Set up a custom domain*, informe `enderecofiscal.nvocoworking.com.br` e siga as instruções. Com o DNS no **Registro.br**, basta criar lá um registro **CNAME** `enderecofiscal` apontando para `nvo-endereco-fiscal-pages.pages.dev`. Até lá, a página fica acessível em `https://nvo-endereco-fiscal-pages.pages.dev`.
+O domínio `https://enderecofiscal.nvocoworking.com.br` está ativo no projeto Pages (*Custom domains*), com um CNAME `enderecofiscal` no Registro.br apontando para `nvo-endereco-fiscal-pages.pages.dev`.
+
+Qualquer acesso por `nvo-endereco-fiscal-pages.pages.dev` ou pelos previews (`*.nvo-endereco-fiscal-pages.pages.dev`) recebe um **redirecionamento 301** para o mesmo caminho no domínio próprio, preservando a query string (inclusive `?gclid=`), e o cabeçalho `X-Robots-Tag: noindex`. Isso é feito em `functions/_middleware.js`. O domínio próprio e o `localhost` não são afetados. Por causa disso, os previews de branch também abrem o domínio próprio, e não a versão da branch.
 
 ### (Recomendado) Limite de requisições
 Em *Security → WAF → Rate limiting rules* (disponível quando o domínio estiver na Cloudflare), limite `POST /api/click` (ex.: 20 por minuto por IP) para evitar registros de lixo.
