@@ -48,12 +48,22 @@
     } catch (e) {}
   </script>
 
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-NR7FQPX');</script>
+  <!-- Google Tag Manager (carregamento adiado): injeta o gtm.js 2 s depois do load
+       ou na primeira interação (pointerdown, keydown ou scroll), o que vier primeiro, uma única vez. -->
+  <script>(function(w,d,l,i){
+    var loaded=false, events=['pointerdown','keydown','scroll'];
+    function loadGTM(){
+      if(loaded)return;loaded=true;
+      events.forEach(function(e){w.removeEventListener(e,loadGTM,true);});
+      w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName('script')[0],j=d.createElement('script'),
+      dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    }
+    events.forEach(function(e){w.addEventListener(e,loadGTM,{capture:true,passive:true});});
+    function afterLoad(){setTimeout(loadGTM,2000);}
+    if(d.readyState==='complete')afterLoad();else w.addEventListener('load',afterLoad);
+  })(window,document,'dataLayer','GTM-NR7FQPX');</script>
   <!-- End Google Tag Manager -->
 
   <script type="application/ld+json">

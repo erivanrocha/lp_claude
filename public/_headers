@@ -14,4 +14,7 @@
   Cache-Control: public, max-age=86400
 
 /assets/logo/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=2592000
+
+/assets/img/*
+  Cache-Control: public, max-age=2592000
